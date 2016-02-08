@@ -43,9 +43,13 @@ private:
 class printJobType
 {
 public:
-    
+	printJobType(int numPages);
+
+	int getNumPages();
+
+	void setNumPages(int n);
 private:
-    int numPages;
+	int numPages;
 };
 
 
