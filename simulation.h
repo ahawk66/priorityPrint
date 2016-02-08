@@ -12,6 +12,18 @@
 #include <fstream>
 
 
+class printerListType
+{
+public:
+    
+private:
+    int numOfPages;
+    
+};
+
+
+
+
 class printerType
 {
 public:
