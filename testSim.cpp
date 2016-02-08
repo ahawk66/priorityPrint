@@ -49,18 +49,17 @@ void runSim()
         numberOfPrintersBeingUsed = 1;
     cout << endl;
     
-    cout << "Do you want to enter a seed? y or n?";
-    string yesOrNo = "n";
-    cin >> yesOrNo;
-    if (yesOrNo == "y" || yesOrNo == "Y")
-    {
-        cout << "Enter the seed: ";
-        cin >> seed;
+    cout << "Enter seed, 0 for no seed: ";
+    cin >> seed;
+    if(seed!=0){
+        srand(seed);
+    } else {
+        srand(time(NULL));
     }
     cout << endl;
 
 
-    //queue<int> printJobs;
+    queue<int> printJobs;
     int randPageNum;
     for (int i = 0; i < numberOfPrintJobs; ++i)
     {
@@ -69,5 +68,26 @@ void runSim()
 
         cout << "Print Job Added [" << randPageNum << "]" << endl;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 }
