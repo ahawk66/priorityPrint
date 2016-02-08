@@ -1,10 +1,8 @@
-#include <stdio.h>
-#include <iostream>
-#include <cstdlib>
-#include <iomanip>
-#include <cmath>
-#include <queue>
 #include <fstream>
+#include <string>
+#include <queue>
+
+using namespace std;
 
 class printJobType
 {
@@ -25,28 +23,51 @@ private:
 	int arrivalTime;
 };
 
-////////
 
 
 
-class printerListType
+
+
+/////////////////////////////////////////
+
+
+class printListType
 {
 public:
-    
+	printListType(int nPrinters, int printerSpeed);
+
+	int setNumPrinters(int n);
+
+	void getNumPrinters();
+
+	bool isPrinterOpen();
+
+	PrinterType getOpenPrinter();
+
+	void decrementPages();
+	
 private:
-    int numOfPages;
-    
+	int numPrinters;
+	PrinterType * printerArray;
+	// to allocate in constructor do printerArray= new printerType[];
 };
 
 
-class printerType
+/////////////////////////////////////////
+
+class PrinterType
 {
-public:
-    printerType();
-    
+public: 
+	PrinterType(int id, int printerSpeed);
+	void addJob(printJobType newJob);
+	bool isEmpty();
+	void decrementPages();
+
 private:
-    int printSpeed;
-    bool busy;
-    
-};
+	int printerSpeed;
+
+}
+
+
+
 
