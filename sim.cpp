@@ -1,1 +1,11 @@
-//Holds all classes, also a empty file at the moment 
+#include "simulation.h"
+
+int printJobType::getNumPages()
+{
+    
+}
+
+void printJobType::setNumPages(int n)
+{
+    
+}

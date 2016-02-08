@@ -22,8 +22,6 @@ private:
 };
 
 
-
-
 class printerType
 {
 public:
@@ -34,10 +32,6 @@ private:
     bool busy;
     
 };
-
-
-
-
 
 
 class printJobType
