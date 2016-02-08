@@ -79,13 +79,13 @@ void runSim()
 	{
 	 int pages = printJobs.pop();
 		if(pages < 10){
-		queueA.add(new PrintJob(pages));
+		queueA.push(new PrintJob(pages, clock));
 		} else if (pages<20){
-		queueB.add(new PrintJob(pages));
+		queueB.push(new PrintJob(pages, clock));
 		} else {
-		queueC.add(new PrintJob(pages));
+		queueC.push(new PrintJob(pages, clock));
 		}
-		printJobList.decrementPages();
+		printerList.decrementPages();
 		while(printerList.isPrinterOpen != false){
 			Printer openPrinter = printerList.getOpenPrinter();
 			completedJobs++;
