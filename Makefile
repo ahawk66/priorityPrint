@@ -1,13 +1,13 @@
-all: make
+all: sim
 
-make: simulator.o sim.cpp testSim.cpp
+sim: simulator.o sim.cpp testSim.cpp
   g++ simulator.o sim.cpp testSim.cpp
 
-simulator.o
+simulator.o: simulator.cpp
   g++ -c simulator.cpp
 
-sim.cpp
+sim.o: sim.cpp
   g++ -c sim.cpp
   
-testSim.o
+testSim.o: testSim.cpp
   g++ -c testSim.cpp
