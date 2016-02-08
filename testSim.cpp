@@ -24,6 +24,7 @@ void runSim()
     int numberOfPrintJobs = 1;
     int numberOfPrintersBeingUsed = 1;
     int seed = 0;
+	int completedJobs = 0;
 
     cout << "Max number of pages per job: ";
     cin >> maxNumOfPages;
@@ -58,8 +59,13 @@ void runSim()
     }
     cout << endl;
 
-
-    queue<int> printJobs;
+	PrintJobQueue queueA = new PrintJobQueue();
+	PrintJobQueue queueB = new PrintJobQueue();
+	PrintJobQueue queueC = new printJobQueue();
+	
+	PrinterList printerList = new PrinterList(numberOfPrintersBeingUsed);
+	
+    queue<int> printJobs; 
     int randPageNum;
     for (int i = 0; i < numberOfPrintJobs; ++i)
     {
@@ -68,26 +74,29 @@ void runSim()
 
         cout << "Print Job Added [" << randPageNum << "]" << endl;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	
+	for(int clock = 1; completedJobs<numberOfPrintJobs; clock++)
+	{
+	 int pages = printJobs.pop();
+		if(pages < 10){
+		queueA.add(new PrintJob(pages));
+		} else if (pages<20){
+		queueB.add(new PrintJob(pages));
+		} else {
+		queueC.add(new PrintJob(pages));
+		}
+		printJobList.decrementPages();
+		while(printerList.isPrinterOpen != false){
+			Printer openPrinter = printerList.getOpenPrinter();
+			completedJobs++;
+			if(queueA.empty() != false){
+				openPrinter.newJob(queueA.push());
+			} else if (queueB.empty()!= false){
+				openPrinter.newJob(queueB.push());
+			} else if (queueC.empty() != false){
+				openPrinter.newJob(queueC.push());
+			}
+		}
+			
+	}
 }
