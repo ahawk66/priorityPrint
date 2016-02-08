@@ -90,11 +90,11 @@ void runSim()
 			Printer openPrinter = printerList.getOpenPrinter();
 			completedJobs++;
 			if(queueA.empty() != false){
-				openPrinter.newJob(queueA.push());
+				openPrinter.addJob(queueA.push());
 			} else if (queueB.empty()!= false){
-				openPrinter.newJob(queueB.push());
+				openPrinter.addJob(queueB.push());
 			} else if (queueC.empty() != false){
-				openPrinter.newJob(queueC.push());
+				openPrinter.addJob(queueC.push());
 			}
 		}
 			
