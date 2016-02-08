@@ -37,15 +37,21 @@ private:
 class printJobType
 {
 public:
-	printJobType(int numPages);
+	printJobType(int nPages, int aTime);
 
 	int getNumPages();
 
 	void setNumPages(int n);
+
+	int getArrivalTime();
+
+	void setArrivalTime(int t);
+
+
 private:
 	int numPages;
+	int arrivalTime;
 };
-
 
 
 
