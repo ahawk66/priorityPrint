@@ -5,7 +5,7 @@
 #include <cmath>
 #include <queue>
 #include <fstream>
-
+#include "simulation.h"
 using namespace std;
 
 void runSim();
@@ -24,8 +24,7 @@ void runSim()
     int numberOfPrintJobs = 1;
     int numberOfPrintersBeingUsed = 1;
     int seed = 0;
-
-    int completedJobs = 0;
+	int completedJobs = 0;
 
     cout << "Max number of pages per job: ";
     cin >> maxNumOfPages;
@@ -60,44 +59,23 @@ void runSim()
     }
     cout << endl;
 
-
-    queue<printJobType> queueA; // # < 10
-    queue<printJobType> queueB; // # >= 10 and < 20
-    queue<printJobType> queueC; // # >= 20
-
-
-    int randPageNum;
-    for (int i = 0; i < numberOfPrintJobs; ++i)
-    {
-        randPageNum = rand() % maxNumOfPages +1;
-        if (randPageNum < 10)
-        {
-            queueA.push(randPageNum);
-            cout << "Queue A Added [" << randPageNum << "]" << endl;
-        }
-            
-        else if (randPageNum >= 10 && randPageNum < 20)
-        {
-            queueB.push(randPageNum);
-            cout << "Queue B Added [" << randPageNum << "]" << endl;
-        }
-        else
-        {
-            queueC.push(randPageNum);
-            cout << "Queue C Added [" << randPageNum << "]" << endl;
-        }
-        
-    }
-
-    
-    
-    for(int clock = 1; completedJobs < numberOfPrintJobs; clock++)
-    {
-
-
-
-    }
-
-
-
+	JobQueueManager * jobQueueManager = new JobQueueManager();
+	PrinterList * printerList = new PrinterList(numberOfPrintersBeingUsed, pagesPerMinute);
+	
+	for(int clock = 1; completedJobs<numberOfPrintJobs; clock++)
+	{
+		cout<<  endl << "--- Clock: "<< clock<< " --Completed Jobs: "<<completedJobs<<" ----- #Jobs in JobQueues"<< (*jobQueueManager).getNumJobs()<<"--------" <<endl;
+		if(clock != numberOfPrintJobs){
+			int pages = rand() % maxNumOfPages +1;
+			cout<<"Pages for job: "<< pages<< endl;
+			//ASSUMES ONE JOB PER MINUTE, THUS CLOCK IS AN IDENTIFYING JOB NUMBER
+			PrintJob * newJob = new PrintJob(clock,pages,clock);
+			int queueNum = (*jobQueueManager).addJob(*newJob);
+			
+			cout<<"NewJob ID: "<< (*newJob).getId();
+		}
+	completedJobs+=(*printerList).updatePrinters(clock, (*jobQueueManager));
+	
+	}
+	cout << " completed jobs: "<< completedJobs<< endl;		
 }
