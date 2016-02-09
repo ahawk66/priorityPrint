@@ -6,127 +6,234 @@
 
 using namespace std;
 
-printJobType::printJobType(int id, int nPages, int aTime)
+JobQueueManager::JobQueueManager()
 {
-	setNumPages(nPages);
-	setArrivalTime(aTime);
+	jobQueuesArray[0] = *(new PrintJobQueue());
+	jobQueuesArray[1] = *(new PrintJobQueue());
+	jobQueuesArray[2] = *(new PrintJobQueue());
+}
+int JobQueueManager::getNumJobs(){
+	int sum = 0;
+	for(int i = 0; i<3; i++){
+		sum+=jobQueuesArray[i].size();
+	}
+	return sum;
+}
+PrintJob JobQueueManager::getJob()
+{
+	 cout<<endl<<"GETJOB"<<endl;
+	PrintJob job = *(new PrintJob(-1,-1,-1));
+	if(!jobQueuesArray[0].empty()){
+		//cout<<"true";
+		job = jobQueuesArray[0].front();
+		jobQueuesArray[0].pop();
+		cout << "getJob gives job"<< job.getId()<<" from queue 1 "<< " size "<< jobQueuesArray[0].size()<<endl;
+		
+	} else if(!jobQueuesArray[1].empty()){
+		//cout<<"true";
+		job = jobQueuesArray[1].front();
+		jobQueuesArray[1].pop();
+		cout << "getJob gives job"<< job.getId()<<" from queue 2 "<< " size "<< jobQueuesArray[1].size()<<endl;
+		
+	} else if(!jobQueuesArray[2].empty()){
+		//cout<<"true";
+		job = jobQueuesArray[2].front();
+		jobQueuesArray[2].pop();
+		cout << "getJob gives job"<< job.getId()<<" from queue 3 "<< " size "<< jobQueuesArray[2].size()<<endl;
+		
+	}
+	
+//	cout<<queue;
+//	cout<<endl<<"getjob "<< job.getRemainingPages()<<endl;
+	return job;
 }
 
-int printJobType::getNumPages()
+bool JobQueueManager::hasJob()
+{
+	if(jobQueuesArray[0].empty()&& jobQueuesArray[1].empty() && jobQueuesArray[2].empty()){
+		return false;
+	}
+	return true;
+}
+int JobQueueManager::addJob(PrintJob job)
+{
+	int queueNum = 0;
+	int numPages = job.getNumPages();
+//	cout<<endl<<"addjob "<< job.getRemainingPages()<<endl;
+	if(numPages < 10){
+		jobQueuesArray[0].push(job);
+		queueNum=1;
+		} else if (numPages<20){
+		jobQueuesArray[1].push(job);
+		queueNum=2;
+		} else {
+		jobQueuesArray[2].push(job);
+		queueNum=3;
+		}
+	//	cout<<endl<<queueNum<<" "<<endl;
+	//	cout<<jobQueuesArray[queueNum-1].empty();
+	//	cout<<endl<<"addjob2"<<jobQueuesArray[queueNum-1].front().getRemainingPages();
+		
+		cout<<endl <<"AddJob added job "<<job.getId() << " to queue "<<queueNum<<endl;
+		return queueNum;
+}
+
+PrintJob::PrintJob(int identifier,int nPages, int arrivalT)
+{
+	id=identifier;
+	numPages=nPages;
+	arrivalTime=arrivalT;
+	remainingPages=nPages;
+}
+bool operator== (PrintJob &cP1, PrintJob &cP2)
+{
+    return (cP1.getId() == cP2.getId());
+}
+bool operator!= (PrintJob &cP1, PrintJob &cP2){
+	return !(cP1 == cP2);
+}
+
+int PrintJob::getNumPages()
 {
 	return numPages;
 }
 
-void printJobType::setNumPages(int n)
-{
-	numPages = n;
-}
-
-int printJobType::getArrivalTime()
+int PrintJob::getArrivalTime()
 {
 	return arrivalTime;
 }
 
-void printJobType::setArrivalTime(int t)
-{
-	arrivalTime = t;
-}
-int printJobType::getId()
+int PrintJob::getId()
 {
 	return id;
 }
-void printJobType::setId(int i)
+int PrintJob::getRemainingPages()
 {
-	id = i;
+	return remainingPages;
+}
+void PrintJob::decrementPages(int pagesToPrint){
+	remainingPages= remainingPages - pagesToPrint;
 }
 
 ////////////////////////////////////////
 
-printerListType::printerListType(int nPrinters)
+PrinterList::PrinterList(int nPrinters, int speed)
 {
-	setNumPrinters(nPrinters);
-	printerArray= new printerType[];
+	numPrinters=nPrinters;
+	printerArray= new Printer[numPrinters];
+	for(int i=0; i < numPrinters; i++){
+		printerArray[i] = *(new Printer(i,speed));
+	}
 }
 
-int printerListType::setNumPrinters(int n)
+int PrinterList::updatePrinters(int clock, JobQueueManager queueManager)
 {
-	numPrinters = n;
+	int jobsCompleted = 0;
+	for(int i=0; i < numPrinters; i++){
+		 
+		 bool startsOpen = printerArray[i].isOpen();
+		 cout<< endl << endl <<" Printer "<<i<< " Starts open? " <<startsOpen;
+		 if(!startsOpen){
+			 PrintJob print = printerArray[i].getCurrentPrintJob();
+			 cout << " JOb ID: "<< (int) print.getId()<< " numPages: "<< print.getNumPages()<<" remainingPages: "<< print.getRemainingPages()<<endl<<endl;
+		 }
+		if(startsOpen && queueManager.hasJob()){
+			printerArray[i].sendJob(queueManager.getJob());
+			printerArray[i].decrementPages();
+			if (printerArray[i].isOpen()){
+				cout<< "Job " <<((int)printerArray[i].getCurrentPrintJob().getId())<<" Finished"<<endl;
+				jobsCompleted++;
+			}	
+		} else if (startsOpen && !queueManager.hasJob()){
+			// if it starts open and no job, do nothing
+		} else if (!startsOpen){	
+		printerArray[i].decrementPages();
+		if (printerArray[i].isOpen()){
+		
+			cout<< "*Job " <<((int)printerArray[i].getCurrentPrintJob().getId())<<" Finished"<<endl;
+			jobsCompleted++;
+			}
+		}
+		
+		if(queueManager.hasJob() && printerArray[i].isOpen()){
+			printerArray[i].sendJob(queueManager.getJob());
+		}
+		
+	}
+	return jobsCompleted;
 }
 
-void printerListType::getNumPrinters()
+int PrinterList::getNumPrinters()
 {
 	return numPrinters;
 }
 
-bool printerListType::isPrinterOpen(PrinterType p)
+bool PrinterList::isPrinterOpen()
 {
-	if (p.isEmpty() == true)
-	{
-		return true;
-	}
-	else
-		return false;
+	bool outcome = false;
+		for(int i=0; i < numPrinters; i++){
+			if(printerArray[i].isOpen()){
+				outcome=true;
+			}
+		}
+	return outcome;
 }
 
-PrinterType printerListType::getOpenPrinter()
+Printer PrinterList::getOpenPrinter()
 {
-	//unsure what to do here
+		for(int i=0; i < numPrinters; i++){
+			if(printerArray[i].isOpen()){
+				return printerArray[i];
+			}
+	}
 }
 
 ///////////////////////////////////////
 
-printerType::printerType(int i, int printerSpeed)
+Printer::Printer(int i, int speed)
 {
-	setId(i);
-	setPrinterSpeed(printerSpeed);
+	id=i;
+	printerSpeed =speed;
+	currentJob=*(new PrintJob(-1,-1, -1));
 }
 
-void printerType::addJob(printJobType newJob)
+void Printer::sendJob(PrintJob newJob)
 {
-	//unsure how to implement
+	cout<<"Printer "<< getId()<<" is being sent Job  "<<newJob.getId()<<endl;
+	currentJob=newJob;
 }
 
-bool printerType::isEmpty()
+bool Printer::isOpen()
 {
-	if (isEmpty == true)
-	{
-		return true;
-	}
-	else
-		return false;
+	return (currentJob.getRemainingPages() <=0);
 }
 
-void printerType::setIsEmpty(bool isE)
+
+void Printer::decrementPages()
 {
-	isEmpty = isE;
+	currentJob.decrementPages(printerSpeed);
 }
 
-void printerType::decrementPages()
-{
-	//unsure how to implement
-}
-
-int printerType::getId()
+int Printer::getId()
 {
 	return id;
 }
-	
-void printerType::setId(int i)
-{
-	id = i;
-}
 
-void printerType::setPrinterSpeed(int ps)
+PrintJob Printer::getCurrentPrintJob()
 {
-	printerSpeed = ps;
+	return currentJob;
 }
 	
-int printerType::getPrinterSpeed()
+
+	
+int Printer::getPrinterSpeed()
 {
 	return printerSpeed;
 }
 
-
+PrintJobQueue::PrintJobQueue()
+{
+}
 
 
 
