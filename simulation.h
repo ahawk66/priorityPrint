@@ -2,83 +2,104 @@
 #include <string>
 #include <queue>
 
+
 using namespace std;
 
-class printJobType
+
+//  JobQueueManager will hold and manage the job queues
+
+
+class PrintJob
 {
 public:
-	printJobType(int i,int nPages, int aTime);
+	PrintJob(int identifier =-1,int nPages = -1, int aTime= -1);
 
 	int getNumPages();
-
-	void setNumPages(int n);
-
 	int getArrivalTime();
-
-	void setArrivalTime(int t);
-
+	int getRemainingPages();
 	int getId();
-
-	void setId(int i);
+	void decrementPages(int pagesToPrint);
 
 private:
 	int numPages;
 	int arrivalTime;
+	int remainingPages;
 	int id;
+};
+
+class PrintJobQueue: public queue<PrintJob>
+{
+public:
+	PrintJobQueue();
+	
 };
 
 /////////////////////////////////////////
 
+class JobQueueManager
+{
+	public:
+	JobQueueManager(); // Constructor will ] generate the queues
+	int addJob(PrintJob job); //newJob takes a printjob, sends it to a print queue, and returns queue id
+	PrintJob getJob();
+	bool hasJob();
+	int getNumJobs();
+	private:
+	PrintJobQueue jobQueuesArray  [3]; // array for jobqueues
+	
+	
+};
 
-class printerListType
+class Printer
+{
+public: 
+	Printer(int identifier = -1, int speed=-1);
+
+	void sendJob(PrintJob newJob);
+
+	bool isOpen();
+
+	void decrementPages();
+
+	int getId();
+
+	int getPrinterSpeed();
+	PrintJob getCurrentPrintJob();
+
+
+private:
+	int printerSpeed;
+	int id;
+	PrintJob currentJob;
+
+};
+
+class PrinterList
 {
 public:
-	printerListType(int nPrinters);
+	PrinterList(int nPrinters, int speed);
+	
+	int updatePrinters(int clock, JobQueueManager queueManager);
 
-	int setNumPrinters(int n);
+	int getNumPrinters();
 
-	void getNumPrinters();
+	bool isPrinterOpen();
 
-	bool isPrinterOpen(PrinterType p);
+	Printer getOpenPrinter();
 
-	PrinterType getOpenPrinter();
-
-	//void decrementPages();
 	
 private:
 	int numPrinters;
-	PrinterType * printerArray;
+	Printer * printerArray;
 	// to allocate in constructor do printerArray= new printerType[];
 };
 
 
 /////////////////////////////////////////
 
-class printerType
-{
-public: 
-	printerType(int i, int printerSpeed);
-
-	void addJob(printJobType newJob);
-
-	bool isEmpty();
-	void setIsEmpty(bool isE);
-
-	void decrementPages();
-
-	int getId();
-	void setId(int i);
-
-	void setPrinterSpeed(int ps);
-	int getPrinterSpeed();
 
 
-private:
-	int printerSpeed;
-	int id;
-	bool isEmpty;
 
-}
 
 
 
