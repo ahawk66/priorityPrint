@@ -7,7 +7,7 @@ using namespace std;
 class printJobType
 {
 public:
-	printJobType(int nPages, int aTime);
+	printJobType(int i,int nPages, int aTime);
 
 	int getNumPages();
 
@@ -17,34 +17,33 @@ public:
 
 	void setArrivalTime(int t);
 
+	int getId();
+
+	void setId(int i);
 
 private:
 	int numPages;
 	int arrivalTime;
+	int id;
 };
-
-
-
-
-
 
 /////////////////////////////////////////
 
 
-class printListType
+class printerListType
 {
 public:
-	printListType(int nPrinters, int printerSpeed);
+	printerListType(int nPrinters);
 
 	int setNumPrinters(int n);
 
 	void getNumPrinters();
 
-	bool isPrinterOpen();
+	bool isPrinterOpen(PrinterType p);
 
 	PrinterType getOpenPrinter();
 
-	void decrementPages();
+	//void decrementPages();
 	
 private:
 	int numPrinters;
@@ -55,16 +54,29 @@ private:
 
 /////////////////////////////////////////
 
-class PrinterType
+class printerType
 {
 public: 
-	PrinterType(int id, int printerSpeed);
+	printerType(int i, int printerSpeed);
+
 	void addJob(printJobType newJob);
+
 	bool isEmpty();
+	void setIsEmpty(bool isE);
+
 	void decrementPages();
+
+	int getId();
+	void setId(int i);
+
+	void setPrinterSpeed(int ps);
+	int getPrinterSpeed();
+
 
 private:
 	int printerSpeed;
+	int id;
+	bool isEmpty;
 
 }
 
