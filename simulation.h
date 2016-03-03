@@ -93,6 +93,9 @@ private:
 	int pagesTillDegrade;
 	int timeTillRecharge;
 	PrintJob currentJob;
+	int totalCost;
+	int totalTimeSpent;
+	int totalPages;
 
 };
 
