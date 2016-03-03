@@ -10,6 +10,8 @@ using namespace std;
 
 void runSim();
 int factorial(int n);
+int poisson(double k);
+int checkThreshold(double rand, double thresholds[], int size);
 
 int main()
 {
@@ -141,26 +143,53 @@ void runSim()
 	if(recoverTime == 0){
 		recoverTime = 2;
 	}
-	int* poissonArray; 
+	
 	
 	double total = 0.0;
 	double temp = 0.0;
 	double t;
+	int maxNumOfJobs = poisson(numOfPrintJobsPerMinute)+1;
+	cout<<endl<<maxNumOfJobs<<endl;
+	double * poissonArray = new double[maxNumOfJobs];
 	
-	for(double i=0; i < 10; i++ ){
-		 t = pow((double)5.0,i);
-		double q = (exp(5.0)*factorial(i));
+	for(int i=0; i < maxNumOfJobs-1; i++ ){
+		 t = pow((double)numOfPrintJobsPerMinute,(double)i);
+		 
+		double q = (exp(numOfPrintJobsPerMinute)*factorial(i));
 		double o = (1.0)/q;
 		double poisson = t*o;
 		total+=poisson;
-		
-		printf("hooplah %lf and %lf and %lf and %lf and %lf \n ",i,t,q,o,poisson);
-		
+		poissonArray[i] = total;
 	}
+	poissonArray[maxNumOfJobs-1]= 1.0;
 	
+	for(int j=0; j< maxNumOfJobs;j++){
+		cout<<"Poisson "<<j<<": "<<poissonArray[j]<<endl;
+	}
+	double *cutOffArray = new double[numOfQueues];
+	double cutOffTotal =0.0;
+	for (int k=0; k< numOfQueues-1; k++){
+		cutOffTotal+=  1.0/(double)(2+k+1);
+		cutOffArray[k] =cutOffTotal;
+	}
+	cutOffArray[numOfQueues-1]= 1.0;
+		for(int j=0; j< numOfQueues;j++){
+		cout<<"CutOff "<<j<<": "<<cutOffArray[j]<<endl;
+	}
 	int clock;
+	double randomNumber;
 	for( clock = 1; completedJobs<numOfPrintJobs; clock++){
+		randomNumber = ((double)rand() / (RAND_MAX));
+		int numOfJobs= checkThreshold(randomNumber,poissonArray,maxNumOfJobs);
 		
+		
+		cout<<randomNumber<<" Number of new jobs this round: "<<numOfJobs<<endl;
+		
+		for(int l=0;l<numOfJobs;l++){
+			randomNumber = ((double)rand() / (RAND_MAX));
+			
+			cout<< "random number "<< randomNumber<< " "<< checkThreshold(randomNumber,cutOffArray,numOfQueues)<<endl;
+		}
 	//	cout<<  endl << "--- Clock: "<< clock<< " -- Completed Jobs: "<<completedJobs<<" ----- # of Jobs in JobQueues: "<< jobQueueManager.getNumJobs()<<" --------" <<endl;
 		
 		completedJobs=numOfPrintJobs;
@@ -172,11 +201,37 @@ void runSim()
 		}
 		
 	}
+}
+int checkThreshold(double rand, double thresholds[], int sizer){
+	int num =-1;
 	
-	
-	
-	
-	
+	if (rand<thresholds[0]){
+		return 0;
+	}
+	for(int i =1; i< sizer-1; i++){
+		
+		if(rand > thresholds[i-1] && rand <thresholds[i] ){
+			num= i;
+		}
+	}
+	if (num=-1){
+		num=sizer-1;
+	}
+	return num;
+}
+
+int poisson(double k){
+	double length;
+	double total= 0.00;
+	for(length=0; total<0.95; length++ ){
+		double t = pow((double)k,length);
+		double o = (1.0)/(exp(k)*factorial(length));
+		double poisson = t*o;
+		total+=poisson;
+	//	cout<<" total: " <<total<<endl;
+		//printf("%lf and %lf and %lf and %lf and %lf \n ",t,o,poisson);
+	}
+	return (int) length-1;
 }
 
 int factorial(int n) 
@@ -185,4 +240,5 @@ int factorial(int n)
        return 1;
     return n * factorial(n - 1);
 }
+
 
