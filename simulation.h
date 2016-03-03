@@ -47,7 +47,7 @@ class JobQueueManager
 {
 	public:
 	JobQueueManager(int); // Constructor will ] generate the queues
-	int addJob(PrintJob job); //newJob takes a printjob, sends it to a print queue, and returns queue id
+	int addJob(int queueIndex,int jobIndex, int time); //newJob takes a printjob, sends it to a print queue, and returns queue id
 	PrintJob getJob();
 	bool hasJob();
 	int getNumJobs();
@@ -103,7 +103,7 @@ private:
 class PrinterManager
 {
 public:
-	PrinterManager(int nPrinters, int speed);
+	PrinterManager(int nPrinters, int degradeRate, double failRate, int rechargeRate);
 	
 	int updatePrinters(int clock, JobQueueManager queueManager);
 

@@ -58,10 +58,17 @@ bool JobQueueManager::hasJob()
 }
 
 //Takes a job and adds itt into the correct queue
-int JobQueueManager::addJob(PrintJob job)
+int JobQueueManager::addJob(int queueIndex,int jobIndex, int timer)
 {
 	srand(time(NULL));
 	double r = ((double) rand() / (RAND_MAX));
+	int num = 0;
+	if(queueIndex ==0){
+	num=rand()%(jobQueueArray[queueIndex].getUpperCutoff()-1 + 1) + 1;
+	} else{
+		num=rand()%(jobQueueArray[queueIndex].getUpperCutoff()-jobQueueArray[queueIndex-1].getUpperCutoff() + 1) + jobQueueArray[queueIndex-1].getUpperCutoff();
+	}
+	jobQueueArray[queueIndex].push(PrintJob(num,jobIndex,timer));
 	
 		return 0;
 }
@@ -112,13 +119,14 @@ void PrintJob::decrementPages(int pagesToPrint){
 
 ////////////////////////////////////////
 
-PrinterManager::PrinterManager(int nPrinters, int speed)
+PrinterManager::PrinterManager(int nPrinters, int dRate, double fRate, int rRate)
 {
 	numPrinters=nPrinters;
 	printerArray= new Printer[numPrinters];
-	for(int i=0; i < numPrinters; i++){
-		printerArray[i] = *(new Printer(i,speed));
-	}
+	degradeRate=dRate;
+	failRate=fRate;
+	rechargeRate=rRate;
+	
 }
 
 //This is the bread and butter.
@@ -189,6 +197,10 @@ Printer PrinterManager::getOpenPrinter()
 				return printerArray[i];
 			}
 	}
+}
+
+void PrinterManager::addPrinter(int index, int speed, int costs){
+	printerArray[index] = Printer(index,speed,costs,degradeRate);
 }
 
 ///////////////////////////////////////

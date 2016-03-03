@@ -144,6 +144,8 @@ void runSim()
 		recoverTime = 2;
 	}
 	
+	PrinterManager printerManager (numOfPrinters,degradeRate,failureRate,recoverTime);
+	
 	
 	double total = 0.0;
 	double temp = 0.0;
@@ -178,27 +180,24 @@ void runSim()
 	}
 	int clock;
 	double randomNumber;
+	int runningJobs=0;
 	for( clock = 1; completedJobs<numOfPrintJobs; clock++){
+		if( runningJobs< numOfPrintJobs ){
+			
 		randomNumber = ((double)rand() / (RAND_MAX));
-		int numOfJobs= checkThreshold(randomNumber,poissonArray,maxNumOfJobs);
-		
-		
+		int numOfJobs= checkThreshold(randomNumber,poissonArray,maxNumOfJobs);		
 		cout<<randomNumber<<" Number of new jobs this round: "<<numOfJobs<<endl;
 		
 		for(int l=0;l<numOfJobs;l++){
 			randomNumber = ((double)rand() / (RAND_MAX));
 			
-			cout<< "random number "<< randomNumber<< " "<< checkThreshold(randomNumber,cutOffArray,numOfQueues)<<endl;
+			 int queueIndex= checkThreshold(randomNumber,cutOffArray,numOfQueues);
+			 jobQueueManager.addJob(queueIndex,runningJobs,clock);
+			 runningJobs++;
 		}
 	//	cout<<  endl << "--- Clock: "<< clock<< " -- Completed Jobs: "<<completedJobs<<" ----- # of Jobs in JobQueues: "<< jobQueueManager.getNumJobs()<<" --------" <<endl;
-		
-		completedJobs=numOfPrintJobs;
-		
-		if( completedJobs < numOfPrintJobs ){
-			
-			
-		
 		}
+		completedJobs+= printerManager.updatePrinters(clock,jobQueueManager);
 		
 	}
 }
@@ -212,9 +211,11 @@ int checkThreshold(double rand, double thresholds[], int sizer){
 		
 		if(rand > thresholds[i-1] && rand <thresholds[i] ){
 			num= i;
-		}
+		} else{
+		//	cout<< "rand: "<<rand<<" , isnt between "<<thresholds[i-1]<<" or "<<thresholds[i]<<endl;
+			}
 	}
-	if (num=-1){
+	if (num==-1){
 		num=sizer-1;
 	}
 	return num;
