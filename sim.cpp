@@ -209,6 +209,9 @@ Printer::Printer(int i, int speed, int costs, int degradeRate)
 	pagesTillDegrade = degradeRate;
 	timeTillRecharge = 0;
 	currentJob=*(new PrintJob(-1,-1, -1));
+	totalCost =0;
+	totalTimeSpent=0;
+	totalPages=0;
 }
 
 //Send job really recieves jobs.
@@ -229,11 +232,26 @@ bool Printer::isOpen()
 void Printer::decrementPages()
 {
 	currentJob.decrementPages(printerSpeed);
+	totalPages+=printerSpeed;
+	totalTimeSpent++;
+	totalCost+=printerSpeed*cost;
 }
 
 int Printer::getId()
 {
 	return id;
+}
+
+int Printer::getTotalPages(){
+	return totalPages;
+}
+
+int Printer::getTotalTimeSpent(){
+	return totalTimeSpent;
+}
+
+int Printer::getTotalCost(){
+	return totalCost;
 }
 
 PrintJob Printer::getCurrentPrintJob()

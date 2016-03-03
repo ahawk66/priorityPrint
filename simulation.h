@@ -82,7 +82,9 @@ public:
 	int getPagesTillDegrade();
 	int getTimeTillRecharge();
 	void setTimeTillRecharge(int time);
-
+	int getTotalCost();
+	int getTotalTimeSpent();
+	int getTotalPages();
 	
 
 private:
