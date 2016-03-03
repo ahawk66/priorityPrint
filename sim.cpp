@@ -7,66 +7,63 @@
 using namespace std;
 
 //initializes our job queues
-JobQueueManager::JobQueueManager()
+JobQueueManager::JobQueueManager(int size)
 {
-    jobQueueOne = new PrintJobQueue();
-	jobQueueTwo = new PrintJobQueue();
-	jobQueueThree = new PrintJobQueue();
+	numOfQueues = size;
+    jobQueueArray = new PrintJobQueue[size];
 }
 //Gets number of jobs
 int JobQueueManager::getNumJobs(){
-	int sum = (*jobQueueOne).size()+(*jobQueueTwo).size()+(*jobQueueThree).size();
+	int sum = 0;
+	for(int i =0; i <numOfQueues; i++){
+		sum+= jobQueueArray[i].size();
+	}
 	return sum;
 }
+
+void JobQueueManager::addQueue(int cutoff, int index){
+	jobQueueArray[index] = PrintJobQueue(cutoff);
+}
+
+
 
 // GetJob pops a job from the lowest queue and returns it
 PrintJob JobQueueManager::getJob()
 {
 	PrintJob job = *(new PrintJob(-1,-1,-1));
-	if(!(*jobQueueOne).empty()){
-		job = (*jobQueueOne).front();
-		(*jobQueueOne).pop();
-		cout << "QueueManager: Transferring Job "<< job.getId()<<" from queue 1. There are  "<< (*jobQueueOne).size()<<" Jobs left in the queue"<<endl;	
-	} else if(!(*jobQueueTwo).empty()){
-		job = (*jobQueueTwo).front();
-		(*jobQueueTwo).pop();
-		cout << "QueueManager: Transferring Job "<< job.getId()<<" from queue 2. There are  "<< (*jobQueueTwo).size()<<" Jobs left in the queue"<<endl;
-		
-	} else if(!(*jobQueueThree).empty()){
-		job = (*jobQueueThree).front();
-		(*jobQueueThree).pop();
-		cout << "QueueManager: Transferring Job "<< job.getId()<<" from queue 3. There are  "<< (*jobQueueThree).size()<<" Jobs left in the queue"<<endl;
-		
+	bool hasChanged= false;
+	for(int i =0; (i<numOfQueues&& !hasChanged); i++){
+		if(!jobQueueArray[i].empty()){
+			job=jobQueueArray[i].front();
+			jobQueueArray[i].pop();
+			cout << "QueueManager: Transferring Job "<< job.getId()<<" from queue "<<(i+1)<<". There are  "<< jobQueueArray[i].size()<<" Jobs left in the queue"<<endl;	
+		}
 	}
+	
 	return job;
 }
 
 //returns if we have a job in any queue
 bool JobQueueManager::hasJob()
 {
-	if((*jobQueueOne).empty()&& (*jobQueueTwo).empty() && (*jobQueueThree).empty()){
-		return false;
+	bool hasJob = true;
+	for(int i =0; i <numOfQueues; i++){
+		if(jobQueueArray[i].empty()){
+			hasJob=false;
+		}
 	}
-	return true;
+		return false;
+	
+	return hasJob;
 }
 
 //Takes a job and adds itt into the correct queue
 int JobQueueManager::addJob(PrintJob job)
 {
-	int queueNum = 0;
-	int numPages = job.getNumPages();
-	if(numPages < 10){
-		(*jobQueueOne).push(job);
-		queueNum=1;
-		} else if (numPages<20){
-		(*jobQueueTwo).push(job);
-		queueNum=2;
-		} else {
-		(*jobQueueThree).push(job);
-		queueNum=3;
-		}		
-		cout<<endl <<"QueueManager: Added Job "<<job.getId() << " to queue "<<queueNum<<endl;
-		return queueNum;
+	srand(time(NULL));
+	double r = ((double) rand() / (RAND_MAX));
+	
+		return 0;
 }
 
 PrintJob::PrintJob(int identifier,int nPages, int arrivalT)
@@ -115,7 +112,7 @@ void PrintJob::decrementPages(int pagesToPrint){
 
 ////////////////////////////////////////
 
-PrinterList::PrinterList(int nPrinters, int speed)
+PrinterManager::PrinterManager(int nPrinters, int speed)
 {
 	numPrinters=nPrinters;
 	printerArray= new Printer[numPrinters];
@@ -126,7 +123,7 @@ PrinterList::PrinterList(int nPrinters, int speed)
 
 //This is the bread and butter.
 //Loops through all the printers, states its opening situation. if it doesnt have a job, gets one and starts printing, if it does, print. If its open at the end give it a new job.
-int PrinterList::updatePrinters(int clock, JobQueueManager queueManager)
+int PrinterManager::updatePrinters(int clock, JobQueueManager queueManager)
 {
 	int jobsCompleted = 0;
 	for(int i=0; i < numPrinters; i++){
@@ -134,6 +131,8 @@ int PrinterList::updatePrinters(int clock, JobQueueManager queueManager)
 		 bool startsOpen = printerArray[i].isOpen();
 		 //Print opening situation
 		 if(!startsOpen){
+			 
+			 
 			 PrintJob print = printerArray[i].getCurrentPrintJob();
 			 cout << "Printer "<<(i+1)<< " has Job "<< (int) print.getId()<< " Start # of Pages:"<< print.getNumPages()<<" Pages Remaining: "<< print.getRemainingPages()<<"" <<endl;
 		 } else {
@@ -141,7 +140,7 @@ int PrinterList::updatePrinters(int clock, JobQueueManager queueManager)
 		 }
 		 //If you dont have a job and we have a job to give
 		if(startsOpen && queueManager.hasJob()){
-			printerArray[i].sendJob(queueManager.getJob());
+			printerArray[i].doJob(queueManager.getJob());
 			printerArray[i].decrementPages();
 			if (printerArray[i].isOpen()){
 				cout<< "Printer "<<(i+1)<< " finished Job " <<((int)printerArray[i].getCurrentPrintJob().getId())<<endl;
@@ -160,19 +159,19 @@ int PrinterList::updatePrinters(int clock, JobQueueManager queueManager)
 		}
 		//If you dont have a job and your open and we have jobs to give, give you one
 		if(queueManager.hasJob() && printerArray[i].isOpen()){
-			printerArray[i].sendJob(queueManager.getJob());
+			printerArray[i].doJob(queueManager.getJob());
 		}
 		
 	}
 	return jobsCompleted;
 }
 
-int PrinterList::getNumPrinters()
+int PrinterManager::getNumPrinters()
 {
 	return numPrinters;
 }
 
-bool PrinterList::isPrinterOpen()
+bool PrinterManager::isPrinterOpen()
 {
 	bool outcome = false;
 		for(int i=0; i < numPrinters; i++){
@@ -183,7 +182,7 @@ bool PrinterList::isPrinterOpen()
 	return outcome;
 }
 
-Printer PrinterList::getOpenPrinter()
+Printer PrinterManager::getOpenPrinter()
 {
 		for(int i=0; i < numPrinters; i++){
 			if(printerArray[i].isOpen()){
@@ -194,23 +193,26 @@ Printer PrinterList::getOpenPrinter()
 
 ///////////////////////////////////////
 
-Printer::Printer(int i, int speed)
+Printer::Printer(int i, int speed, int costs, int degradeRate)
 {
 	id=i;
 	printerSpeed =speed;
+	cost = costs;
+	pagesTillDegrade = degradeRate;
+	timeTillRecharge = 0;
 	currentJob=*(new PrintJob(-1,-1, -1));
 }
 
 //Send job really recieves jobs.
-void Printer::sendJob(PrintJob newJob)
+void Printer::doJob(PrintJob newJob)
 {
-	cout<<"Printer "<< (getId()+1)<<" is being sent Job  "<<newJob.getId()<<endl;
+	cout<<"Printer "<< (getId()+1)<<" is starting Job  "<<newJob.getId()<<endl;
 	currentJob=newJob;
 }
 
 bool Printer::isOpen()
 {
-	return (currentJob.getRemainingPages() <=0);
+	return (currentJob.getRemainingPages() <=0 && timeTillRecharge <= 0);
 }
 
 
@@ -234,7 +236,34 @@ int Printer::getPrinterSpeed()
 	return printerSpeed;
 }
 
+void Printer::setPagesTillDegrade(int pages){
+	pagesTillDegrade=pages;
+}
+int Printer::getPagesTillDegrade(){
+	return pagesTillDegrade;
+}
+int Printer::getTimeTillRecharge(){
+	return timeTillRecharge;
+}
+void Printer::setTimeTillRecharge(int time){
+	timeTillRecharge=time;
+}
+
+PrintJobQueue::PrintJobQueue(int uCutoff)
+{
+	upperCutoff=uCutoff;
+}
 PrintJobQueue::PrintJobQueue()
 {
+	upperCutoff=0;
 }
+
+int PrintJobQueue::getUpperCutoff(){
+	return upperCutoff;
+}
+
+
+
+
+
 

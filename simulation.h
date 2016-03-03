@@ -30,7 +30,13 @@ private:
 class PrintJobQueue: public queue<PrintJob>
 {
 public:
+	PrintJobQueue(int upperCutoff);
 	PrintJobQueue();
+	int getUpperCutoff();
+	
+
+private: 
+	int upperCutoff;
 	
 };
 
@@ -40,15 +46,16 @@ public:
 class JobQueueManager
 {
 	public:
-	JobQueueManager(); // Constructor will ] generate the queues
+	JobQueueManager(int); // Constructor will ] generate the queues
 	int addJob(PrintJob job); //newJob takes a printjob, sends it to a print queue, and returns queue id
 	PrintJob getJob();
 	bool hasJob();
 	int getNumJobs();
+	void addQueue(int cutoff, int index);
 	private:
-	PrintJobQueue* jobQueueOne; // array for jobqueues
-	PrintJobQueue* jobQueueTwo;
-	PrintJobQueue* jobQueueThree;
+	PrintJobQueue *jobQueueArray;
+	int numOfQueues;
+	
 	
 };
 
@@ -58,9 +65,9 @@ class JobQueueManager
 class Printer
 {
 public: 
-	Printer(int identifier = -1, int speed=-1);
+	Printer(int identifier = -1, int speed=-1, int cost=-1, int degradeRat=-1);
 
-	void sendJob(PrintJob newJob);
+	void doJob(PrintJob newJob);
 
 	bool isOpen();
 
@@ -70,11 +77,21 @@ public:
 
 	int getPrinterSpeed();
 	PrintJob getCurrentPrintJob();
+	
+	void setPagesTillDegrade(int pages);
+	int getPagesTillDegrade();
+	int getTimeTillRecharge();
+	void setTimeTillRecharge(int time);
 
+	
 
 private:
 	int printerSpeed;
 	int id;
+	int cost;
+	int pagesPrinted;
+	int pagesTillDegrade;
+	int timeTillRecharge;
 	PrintJob currentJob;
 
 };
@@ -83,10 +100,10 @@ private:
 //  The printer list holds and generates all the printers and will tell you if they are open and how many we have.
 //  It also holds the key function to update the printers(fetch and process jobs)
 /////////////////////////////////////////
-class PrinterList
+class PrinterManager
 {
 public:
-	PrinterList(int nPrinters, int speed);
+	PrinterManager(int nPrinters, int speed);
 	
 	int updatePrinters(int clock, JobQueueManager queueManager);
 
@@ -96,10 +113,14 @@ public:
 
 	Printer getOpenPrinter();
 
+	void addPrinter(int id, int speed, int cost);
 	
 private:
 	int numPrinters;
 	Printer * printerArray;
+	int degradeRate;
+	double failRate;
+	int rechargeRate;
 	// to allocate in constructor do printerArray= new printerType[];
 };
 
