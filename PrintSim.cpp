@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <cstdlib>
 #include <iomanip>
@@ -52,7 +51,7 @@ void runSim()
     {
         maxNumPagesPerJob = 50;
         numOfPrintJobs = 100;
-        numOfPrinters = 3;
+        
         numOfPrintJobsPerMinute = 3;
         numOfQueues = 3;
         
@@ -107,7 +106,7 @@ void runSim()
         exit(1);
     }
     
-    
+    PrinterManager *printerManager;
     JobQueueManager jobQueueManager(numOfQueues);
     
     cout<<endl<<"Upper page cutoffs for each job level, highest priority first.\n* No Defaults Avalible *\n";
@@ -169,34 +168,70 @@ void runSim()
             cout << "Please enter a number greater than 0: ";
             cin >> recoverTime;
         }
+		
+		  printerManager = new PrinterManager(numOfPrinters,degradeRate,failureRate,recoverTime);
         
-        cout<< "Cost per page (Default 0.10): ";
-        cin>>costPerPage;
-        while(costPerPage < 0)
-        {
-            cout << "Please enter a number greater than 0: ";
-            cin >> costPerPage;
-        }
+		cout << "\nWould you like a different cost per page for each printer? (y)es or (n)o" << endl;
+		cin >> isCustom;
+		int * printerCosts = new int[numOfPrinters];
+		if (isCustom == "n" || isCustom == "N" || isCustom == "no" || isCustom == "NO"){		
+			cout<< "Please enter a Cost per page (Default 0.10): ";
+				cin>>costPerPage;
+				while(costPerPage < 0)
+				{
+					cout << "Please enter a number greater than 0: ";
+					cin >> costPerPage;
+				}
+			
+			for(int i =0; i <numOfPrinters; i++){
+				printerCosts[i]  = costPerPage;
+			}
+			
+		} else {
+			for(int i =0; i <numOfPrinters; i++){
+				cout<< "Please enter a Cost per page (Default 0.10): ";
+				cin>>costPerPage;
+				while(costPerPage < 0)
+				{
+					cout << "Please enter a number greater than 0: ";
+					cin >> costPerPage;
+				}
+				printerCosts[i] =costPerPage;
+			}
+		}
+		
+		cout << "\nWould you like a different speed for each printer? (y)es or (n)o" << endl;
+		cin >> isCustom;
+		if (isCustom == "n" || isCustom == "N" || isCustom == "no" || isCustom == "NO"){		
+			cout<< "Please enter a Printer Speed (Default 1): ";
+			cin>>printerSpeed;
+			while(printerSpeed < 0)
+			{
+				cout << "Please enter a number greater than 0: ";
+				cin >> printerSpeed;
+			}
+			for(int i =0; i <numOfPrinters; i++){
+				(*printerManager).addPrinter(i,printerSpeed,printerCosts[i]);
+			}
+		} else {
+			for(int i =0; i <numOfPrinters; i++){
+				cout<< "Please enter a Printer Speed (Default 1): ";
+			cin>>printerSpeed;
+			while(printerSpeed < 0)
+			{
+				cout << "Please enter a number greater than 0: ";
+				cin >> printerSpeed;
+			}
+				(*printerManager).addPrinter(i,printerSpeed,printerCosts[i]);
+			}
+		}
         
-        cout<< "Printer Speed (Default 1): ";
-        cin>>printerSpeed;
-        while(printerSpeed < 0)
-        {
-            cout << "Please enter a number greater than 0: ";
-            cin >> printerSpeed;
-        }
         
         cout << endl;
         
     }
 
-    
 
-    
-    
-    PrinterManager printerManager (numOfPrinters,degradeRate,failureRate,recoverTime);
-    
-    
     double total = 0.0;
     double temp = 0.0;
     double t;
@@ -231,12 +266,14 @@ void runSim()
     int clock;
     double randomNumber;
     int runningJobs=0;
-    for( clock = 1; completedJobs<numOfPrintJobs; clock++){
+    for( clock = 1; (completedJobs<numOfPrintJobs); clock++){
+		cout<<  endl << "--- Clock: "<< clock<< " -- Completed Jobs: "<<completedJobs<<" ----- # of Jobs in JobQueues: "<< jobQueueManager.getNumJobs()<<" --------" <<endl;
+		
         if( runningJobs< numOfPrintJobs ){
             
             randomNumber = ((double)rand() / (RAND_MAX));
             int numOfJobs= checkThreshold(randomNumber,poissonArray,maxNumOfJobs);
-            cout<<randomNumber<<" Number of new jobs this round: "<<numOfJobs<<endl;
+            cout<<" Number of new jobs this clock-tick: "<<numOfJobs<<endl;
             
             for(int l=0;l<numOfJobs;l++){
                 randomNumber = ((double)rand() / (RAND_MAX));
@@ -245,9 +282,9 @@ void runSim()
                 jobQueueManager.addJob(queueIndex,runningJobs,clock);
                 runningJobs++;
             }
-            //	cout<<  endl << "--- Clock: "<< clock<< " -- Completed Jobs: "<<completedJobs<<" ----- # of Jobs in JobQueues: "<< jobQueueManager.getNumJobs()<<" --------" <<endl;
         }
-        completedJobs+= printerManager.updatePrinters(clock,jobQueueManager);
+		
+        completedJobs+= (*printerManager).updatePrinters(clock,jobQueueManager);
         
     }
 }
@@ -291,5 +328,3 @@ int factorial(int n)
         return 1;
     return n * factorial(n - 1);
 }
-
-
