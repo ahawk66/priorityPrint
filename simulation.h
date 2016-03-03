@@ -82,9 +82,10 @@ public:
 	int getPagesTillDegrade();
 	int getTimeTillRecharge();
 	void setTimeTillRecharge(int time);
-	int getTotalCost();
+	double getTotalCost();
 	int getTotalTimeSpent();
 	int getTotalPages();
+	int getTotalJobs();
 	
 
 private:
@@ -95,9 +96,10 @@ private:
 	int pagesTillDegrade;
 	int timeTillRecharge;
 	PrintJob currentJob;
-	int totalCost;
+	double totalCost;
 	int totalTimeSpent;
 	int totalPages;
+	int totalJobs;
 
 };
 
@@ -119,6 +121,8 @@ public:
 	Printer getOpenPrinter();
 
 	void addPrinter(int id, int speed, int cost);
+	
+	void printerSummary(int time);
 	
 private:
 	int numPrinters;

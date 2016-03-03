@@ -199,6 +199,13 @@ void PrinterManager::addPrinter(int index, int speed, int costs){
 	printerArray[index] = Printer(index,speed,costs,degradeRate);
 }
 
+void PrinterManager::printerSummary(int time){
+	cout<< "-------Printer Summary--------"<<endl;
+	for(int i =0; i < numPrinters; i++){
+		cout<< "Printer "<< i<< " handled "<< printerArray[i].getTotalJobs()<< " jobs and "<<printerArray[i].getTotalPages()<<" pages, to a tune of " <<printerArray[i].getTotalCost()<<" Dollars. Total time printing: "<< printerArray[i].getTotalTimeSpent()<< " . Which gives this printer "<<(((double )printerArray[i].getTotalTimeSpent()/time)*100)<<"% utilization!"<<endl<<endl;
+	}
+}
+
 ///////////////////////////////////////
 
 Printer::Printer(int i, int speed, int costs, int degradeRate)
@@ -212,6 +219,7 @@ Printer::Printer(int i, int speed, int costs, int degradeRate)
 	totalCost =0;
 	totalTimeSpent=0;
 	totalPages=0;
+	totalJobs=0;
 }
 
 //Send job really recieves jobs.
@@ -220,7 +228,9 @@ void Printer::doJob(PrintJob newJob)
 	if (newJob.getId()!=-1){
 	cout<<"Printer "<< (getId()+1)<<" is starting Job  "<<newJob.getId()<<endl;
 	currentJob=newJob;
+	totalJobs++;
 	}
+	
 }
 
 bool Printer::isOpen()
@@ -250,8 +260,12 @@ int Printer::getTotalTimeSpent(){
 	return totalTimeSpent;
 }
 
-int Printer::getTotalCost(){
+double Printer::getTotalCost(){
 	return totalCost;
+}
+
+int Printer::getTotalJobs(){
+	return totalJobs;
 }
 
 PrintJob Printer::getCurrentPrintJob()

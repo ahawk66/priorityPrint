@@ -267,7 +267,7 @@ void runSim()
     double randomNumber;
     int runningJobs=0;
     for( clock = 1; (completedJobs<numOfPrintJobs); clock++){
-		cout<<  endl << "--- Clock: "<< clock<< " -- Completed Jobs: "<<completedJobs<<" ----- # of Jobs in JobQueues: "<< jobQueueManager.getNumJobs()<<" --------" <<endl;
+		cout<<  endl << "--- Clock: "<< clock<< " -- Completed Jobs: "<<completedJobs<<" ----- # of Jobs in JobQueues: "<< jobQueueManager.getNumJobs()<<" ---- Running Jobs "<<runningJobs<<"-- num Of Printjobs "<<numOfPrintJobs<<"--" <<endl;
 		
         if( runningJobs< numOfPrintJobs ){
             
@@ -287,6 +287,8 @@ void runSim()
         completedJobs+= (*printerManager).updatePrinters(clock,jobQueueManager);
         
     }
+	clock--;
+	(*printerManager).printerSummary(clock);
 }
 int checkThreshold(double rand, double thresholds[], int sizer){
     int num =-1;
