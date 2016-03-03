@@ -292,7 +292,7 @@ void runSim()
 	cout<<"Seed: "<< seed<<endl;
 	cout<<"The simulation took " << (clock)<< " minutes to complete all jobs"<<endl;
 	cout<<"The average print-time was "<< ((double) clock/completedJobs)<<endl<<endl;
-	cout<<"The total cost was "<<printerManager.getTotalCost()<<" dollars.";
+	cout<<"The total cost was "<<(*printerManager).getTotalCost()<<" dollars.";
 	(*printerManager).printerSummary(clock);
 }
 int checkThreshold(double rand, double thresholds[], int sizer){
