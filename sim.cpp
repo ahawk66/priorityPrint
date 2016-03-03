@@ -46,15 +46,9 @@ PrintJob JobQueueManager::getJob()
 //returns if we have a job in any queue
 bool JobQueueManager::hasJob()
 {
-	bool hasJob = true;
-	for(int i =0; i <numOfQueues; i++){
-		if(jobQueueArray[i].empty()){
-			hasJob=false;
-		}
-	}
-		return false;
+
 	
-	return hasJob;
+	return (getNumJobs()==0);
 }
 
 //Takes a job and adds itt into the correct queue
@@ -133,6 +127,7 @@ PrinterManager::PrinterManager(int nPrinters, int dRate, double fRate, int rRate
 //Loops through all the printers, states its opening situation. if it doesnt have a job, gets one and starts printing, if it does, print. If its open at the end give it a new job.
 int PrinterManager::updatePrinters(int clock, JobQueueManager queueManager)
 {
+	cout<< "Update printers "<<numPrinters<<endl;
 	int jobsCompleted = 0;
 	for(int i=0; i < numPrinters; i++){
 		 
@@ -147,15 +142,16 @@ int PrinterManager::updatePrinters(int clock, JobQueueManager queueManager)
 			 cout<<"Printer "<<(i+1)<< " is empty! "<<endl;
 		 }
 		 //If you dont have a job and we have a job to give
-		if(startsOpen && queueManager.hasJob()){
+		if(startsOpen && queueManager.getNumJobs()!=0){
+			cout<<"bam";
 			printerArray[i].doJob(queueManager.getJob());
 			printerArray[i].decrementPages();
 			if (printerArray[i].isOpen()){
 				cout<< "Printer "<<(i+1)<< " finished Job " <<((int)printerArray[i].getCurrentPrintJob().getId())<<endl;
 				jobsCompleted++;
 			}	
-		} else if (startsOpen && !queueManager.hasJob()){
-			// if it starts open and no jobs to give, do nothing
+		} else if (startsOpen && queueManager.getNumJobs()==0){
+			 // if it starts open and no jobs to give, do nothing
 		} else if (!startsOpen){	
 		//if you got a job start printing
 		printerArray[i].decrementPages();
@@ -218,8 +214,10 @@ Printer::Printer(int i, int speed, int costs, int degradeRate)
 //Send job really recieves jobs.
 void Printer::doJob(PrintJob newJob)
 {
+	if (newJob.getId()!=-1){
 	cout<<"Printer "<< (getId()+1)<<" is starting Job  "<<newJob.getId()<<endl;
 	currentJob=newJob;
+	}
 }
 
 bool Printer::isOpen()
