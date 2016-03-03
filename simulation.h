@@ -124,6 +124,7 @@ public:
 	
 	void printerSummary(int time);
 	
+	double getTotalCost();
 private:
 	int numPrinters;
 	Printer * printerArray;

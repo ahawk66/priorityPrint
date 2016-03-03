@@ -267,7 +267,7 @@ void runSim()
     double randomNumber;
     int runningJobs=0;
     for( clock = 1; (completedJobs<numOfPrintJobs); clock++){
-		cout<<  endl << "--- Clock: "<< clock<< " -- Completed Jobs: "<<completedJobs<<" ----- # of Jobs in JobQueues: "<< jobQueueManager.getNumJobs()<<" ---- Running Jobs "<<runningJobs<<"-- num Of Printjobs "<<numOfPrintJobs<<"--" <<endl;
+		cout<<  endl << "--- Clock: "<< clock<< " -- Completed Jobs: "<<completedJobs<<" ----- # of Jobs in JobQueues: "<< jobQueueManager.getNumJobs()<<" --------" <<endl;
 		
         if( runningJobs< numOfPrintJobs ){
             
@@ -288,6 +288,11 @@ void runSim()
         
     }
 	clock--;
+	cout<<endl<< "------------------------SUMMARY--------------------------"<<endl;
+	cout<<"Seed: "<< seed<<endl;
+	cout<<"The simulation took " << (clock)<< " minutes to complete all jobs"<<endl;
+	cout<<"The average print-time was "<< ((double) clock/completedJobs)<<endl<<endl;
+	cout<<"The total cost was "<<printerManager.getTotalCost()<<" dollars.";
 	(*printerManager).printerSummary(clock);
 }
 int checkThreshold(double rand, double thresholds[], int sizer){

@@ -206,6 +206,13 @@ void PrinterManager::printerSummary(int time){
 	}
 }
 
+double PrinterManager::getTotalCost(){
+	double sum = 0;
+	for(int i=0; i < numPrinters; i++){
+		sum += printerArray[i].getTotalCost();
+	}
+	return sum;
+}
 ///////////////////////////////////////
 
 Printer::Printer(int i, int speed, int costs, int degradeRate)
