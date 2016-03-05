@@ -33,11 +33,16 @@ public:
 	PrintJobQueue(int upperCutoff);
 	PrintJobQueue();
 	int getUpperCutoff();
-	
+	int getTotalJobCount();
+	int getTotalPageCount();
+	void increaseTotalJobCount(int count);
+	void increaseTotalPageCount(int count);
 
-private: 
+
+private:
 	int upperCutoff;
-	
+	int totalJobCount;
+	int totalPageCount;
 };
 
 /////////////////////////////////////////
@@ -45,18 +50,20 @@ private:
 /////////////////////////////////////////
 class JobQueueManager
 {
-	public:
+public:
 	JobQueueManager(int); // Constructor will ] generate the queues
 	int addJob(int queueIndex,int jobIndex, int time); //newJob takes a printjob, sends it to a print queue, and returns queue id
 	PrintJob getJob();
 	bool hasJob();
 	int getNumJobs();
+	void stats();
 	void addQueue(int cutoff, int index);
-	private:
+	int getCutoff(int index);
+private:
 	PrintJobQueue *jobQueueArray;
 	int numOfQueues;
-	
-	
+
+
 };
 
 /////////////////////////////////////////
@@ -64,8 +71,8 @@ class JobQueueManager
 /////////////////////////////////////////
 class Printer
 {
-public: 
-	Printer(int identifier = -1, int speed=-1, int cost=-1, int degradeRat=-1);
+public:
+	Printer(int identifier = -1, int speed=-1, double cost=-1, int degradeRat=-1, double rechargeRate=-1, double failRate=-1);
 
 	void doJob(PrintJob newJob);
 
@@ -77,7 +84,7 @@ public:
 
 	int getPrinterSpeed();
 	PrintJob getCurrentPrintJob();
-	
+
 	void setPagesTillDegrade(int pages);
 	int getPagesTillDegrade();
 	int getTimeTillRecharge();
@@ -86,20 +93,27 @@ public:
 	int getTotalTimeSpent();
 	int getTotalPages();
 	int getTotalJobs();
-	
+	int getRechargeRate();
+	int getDegradeRate();
+	double getCost();
+
 
 private:
 	int printerSpeed;
 	int id;
-	int cost;
+	double cost;
 	int pagesPrinted;
 	int pagesTillDegrade;
 	int timeTillRecharge;
+	int rechargeRate;
+	double failRate;
+
 	PrintJob currentJob;
 	double totalCost;
 	int totalTimeSpent;
 	int totalPages;
 	int totalJobs;
+	int degradeRate;
 
 };
 
@@ -110,8 +124,8 @@ private:
 class PrinterManager
 {
 public:
-	PrinterManager(int nPrinters, int degradeRate, double failRate, int rechargeRate);
-	
+	PrinterManager(int nPrinters);
+
 	int updatePrinters(int clock, JobQueueManager queueManager);
 
 	int getNumPrinters();
@@ -120,27 +134,14 @@ public:
 
 	Printer getOpenPrinter();
 
-	void addPrinter(int id, int speed, int cost);
-	
+	void addPrinter(int id, int speed, double cost, int degradeRate, double failRate, int rechargeRate);
+
 	void printerSummary(int time);
-	
+
 	double getTotalCost();
 private:
 	int numPrinters;
 	Printer * printerArray;
-	int degradeRate;
-	double failRate;
-	int rechargeRate;
+
 	// to allocate in constructor do printerArray= new printerType[];
 };
-
-
-/////////////////////////////////////////
-
-
-
-
-
-
-
-
