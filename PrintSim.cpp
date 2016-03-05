@@ -12,11 +12,14 @@ int factorial(int n);
 int poisson(double k);
 int checkThreshold(double rand, double thresholds[], int size);
 
+//calls runSim
 int main()
 {
 	runSim();
 	return 0;
 }
+
+//Runs the simulation fully, takes in all the inputs and calculates probabilities
 
 void runSim()
 {
@@ -229,10 +232,13 @@ void runSim()
 		poissonArray[i] = total;
 	}
 	poissonArray[maxNumOfJobs-1]= 1.0;
-
+    
+    //Using poisson formula to generate the number of jobs that arrive
+    
 	for(int j=0; j< maxNumOfJobs;j++){
 		cout<<"Poisson "<<j<<": "<<poissonArray[j]<<endl;
 	}
+    //dynamically allocating new threshold arrays
 	double *cutOffArray = new double[numOfQueues];
 	double cutOffTotal =0.0;
 	for (int k=0; k< numOfQueues-1; k++){
@@ -246,6 +252,7 @@ void runSim()
 	int clock;
 	double randomNumber;
 	int runningJobs=0;
+    //loop that checks if there are less completed jobs than number of print jobs, it will generate new jobs
 	for( clock = 1; (completedJobs<numOfPrintJobs); clock++){
 		cout<<  endl << "--- Clock: "<< clock<< " -- Completed Jobs: "<<completedJobs<<" ----- # of Jobs in JobQueues: "<< jobQueueManager.getNumJobs()<<"-----" <<endl;
 		if( runningJobs< numOfPrintJobs ){
@@ -267,7 +274,7 @@ void runSim()
 		completedJobs+= (*printerManager).updatePrinters(clock,jobQueueManager);
 
 	}
-
+    //Prints out entire summary after all jobs have been completed
 	clock--;
 	cout<<endl<< "------------------------SUMMARY--------------------------"<<endl;
 	cout<<"--------Input settings------"<<endl;
@@ -281,13 +288,15 @@ void runSim()
 	}
 	cout<<"Number of pages to print before maintenance: "<<degradeRate<<endl;
 	cout<<"Probability the printer fails: "<<failureRate<<endl;
-	cout<<"Printer recovery time: "<<recoverTime;
+    cout<<"Printer recovery time: "<<recoverTime << endl;
 	cout<<"Seed: "<< seed<<endl;
 	(*printerManager).printerSummary(clock);
 	jobQueueManager.stats();
 	cout<<"The simulation took " << (clock)<< " minutes to complete all jobs"<<endl;
 	cout<<"The average print-time was "<< ((double) clock/completedJobs)<<endl<<endl;
 	cout<<"The total cost was "<<(*printerManager).getTotalCost()<<" dollars." << endl;
+    
+
 }
 int checkThreshold(double rand, double thresholds[], int sizer){
 	int num =-1;
@@ -309,6 +318,7 @@ int checkThreshold(double rand, double thresholds[], int sizer){
 	return num;
 }
 
+//Function that calculates the poisson value
 int poisson(double k){
 	double length;
 	double total= 0.00;
@@ -323,6 +333,7 @@ int poisson(double k){
 	return (int) length-1;
 }
 
+//generates factorial number
 int factorial(int n)
 {
 	if (n == 0)
