@@ -1,7 +1,7 @@
 all: sim
 
-sim: simulator.o sim.cpp testSim.cpp
-  g++ simulator.o sim.cpp testSim.cpp
+sim: simulator.o sim.cpp printSim.cpp
+  g++ simulator.o sim.cpp printSim.cpp
 
 simulator.o: simulator.cpp
   g++ -c simulator.cpp
@@ -9,5 +9,5 @@ simulator.o: simulator.cpp
 sim.o: sim.cpp
   g++ -c sim.cpp
   
-testSim.o: testSim.cpp
-  g++ -c testSim.cpp
+printSim.o: testSim.cpp
+  g++ -c printSim.cpp
